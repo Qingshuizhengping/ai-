@@ -30,15 +30,19 @@ def main():
     # 将RAG系统传递给API模块
     init_rag(rag)
     
+    # 获取端口（优先使用环境变量）
+    port = int(os.environ.get('PORT', Config.PORT))
+    host = os.environ.get('HOST', Config.HOST)
+    
     print("\n" + "=" * 60)
     print("系统初始化完成！")
-    print(f"访问地址: http://{Config.HOST}:{Config.PORT}")
+    print(f"访问地址: http://{host}:{port}")
     print("=" * 60)
     
     # 启动服务器
     app.run(
-        host=Config.HOST,
-        port=Config.PORT,
+        host=host,
+        port=port,
         debug=Config.DEBUG
     )
 
