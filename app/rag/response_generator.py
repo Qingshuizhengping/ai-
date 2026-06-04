@@ -100,6 +100,8 @@ class ResponseGenerator:
 
         if config_path and os.path.exists(config_path):
             self._load_config(config_path)
+        else:
+            self._load_from_env()
 
     def _load_config(self, config_path: str):
         """
@@ -127,6 +129,33 @@ class ResponseGenerator:
         except Exception as e:
             print(f"LLM配置加载失败，将使用本地回退模式: {e}")
             self.client = None
+
+    def _load_from_env(self):
+        """
+        从环境变量加载LLM配置
+        """
+        api_key = os.environ.get('OPENAI_API_KEY', '')
+        base_url = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
+        model = os.environ.get('OPENAI_MODEL', 'deepseek-ai/DeepSeek-V4-Flash')
+
+        if api_key:
+            try:
+                from openai import OpenAI
+
+                self.client = OpenAI(
+                    api_key=api_key,
+                    base_url=base_url,
+                )
+                self.model = model
+                self.max_tokens = int(os.environ.get('OPENAI_MAX_TOKENS', '1024'))
+                self.temperature = float(os.environ.get('OPENAI_TEMPERATURE', '0.7'))
+
+                print(f"LLM已从环境变量配置: model={self.model}, base_url={base_url}")
+            except Exception as e:
+                print(f"从环境变量加载LLM配置失败: {e}")
+                self.client = None
+        else:
+            print("未找到LLM配置，将使用本地回退模式")
 
     def generate(self, question: str, results: List[Dict[str, Any]], history: List[Dict[str, str]] = None) -> str:
         """
