@@ -3,9 +3,6 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '.github/**'
-      - 'README.md'
 
 jobs:
   build-and-push:
