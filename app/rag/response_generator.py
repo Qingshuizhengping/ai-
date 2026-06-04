@@ -134,9 +134,16 @@ class ResponseGenerator:
         """
         从环境变量加载LLM配置
         """
+        import sys
         api_key = os.environ.get('OPENAI_API_KEY', '')
         base_url = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
         model = os.environ.get('OPENAI_MODEL', 'deepseek-ai/DeepSeek-V4-Flash')
+
+        # 调试日志 - 输出到stderr确保Railway能捕获
+        sys.stderr.write(f"[DEBUG] OPENAI_API_KEY 是否设置: {bool(api_key)} (长度={len(api_key)})\n")
+        sys.stderr.write(f"[DEBUG] OPENAI_BASE_URL: {base_url}\n")
+        sys.stderr.write(f"[DEBUG] OPENAI_MODEL: {model}\n")
+        sys.stderr.flush()
 
         if api_key:
             try:
@@ -150,12 +157,21 @@ class ResponseGenerator:
                 self.max_tokens = int(os.environ.get('OPENAI_MAX_TOKENS', '1024'))
                 self.temperature = float(os.environ.get('OPENAI_TEMPERATURE', '0.7'))
 
-                print(f"LLM已从环境变量配置: model={self.model}, base_url={base_url}")
+                msg = f"LLM已从环境变量配置: model={self.model}, base_url={base_url}"
+                print(msg)
+                sys.stderr.write(f"[DEBUG] {msg}\n")
+                sys.stderr.flush()
             except Exception as e:
-                print(f"从环境变量加载LLM配置失败: {e}")
+                err_msg = f"从环境变量加载LLM配置失败: {e}"
+                print(err_msg)
+                sys.stderr.write(f"[DEBUG] {err_msg}\n")
+                sys.stderr.flush()
                 self.client = None
         else:
-            print("未找到LLM配置，将使用本地回退模式")
+            msg = "未找到OPENAI_API_KEY环境变量，将使用本地回退模式"
+            print(msg)
+            sys.stderr.write(f"[DEBUG] {msg}\n")
+            sys.stderr.flush()
 
     def generate(self, question: str, results: List[Dict[str, Any]], history: List[Dict[str, str]] = None) -> str:
         """

@@ -99,5 +99,12 @@ def status():
     global rag_system
     if rag_system:
         stats = rag_system.get_stats()
-        return jsonify({"status": "ok", "count": stats["count"]})
+        llm_ok = rag_system.response_generator.client is not None
+        llm_model = rag_system.response_generator.model if llm_ok else None
+        return jsonify({
+            "status": "ok",
+            "count": stats["count"],
+            "llm_ready": llm_ok,
+            "llm_model": llm_model,
+        })
     return jsonify({"status": "initializing"})
