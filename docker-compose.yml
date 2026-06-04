@@ -1,0 +1,14 @@
+services:
+  ai-qisao:
+    build: .
+    container_name: ai-qisao
+    ports:
+      - "5000:5000"
+    volumes:
+      - qisao-data:/app/data
+    restart: unless-stopped
+    environment:
+      - FLASK_DEBUG=False
+
+volumes:
+  qisao-data:
